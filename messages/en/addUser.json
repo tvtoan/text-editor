@@ -1,0 +1,14 @@
+{
+  "title": "Add New User",
+  "nameLabel": "User Name",
+  "namePlaceholder": "Enter user name",
+  "nameRequired": "Please enter name",
+  "emailLabel": "User Email",
+  "emailPlaceholder": "Enter user email",
+  "emailRequired": "Please enter email",
+  "emailInvalid": "Invalid email",
+  "submitButton": "Add User",
+  "submittingButton": "Adding...",
+  "success": "User added successfully",
+  "error": "Failed to add user"
+}

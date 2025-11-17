@@ -1,0 +1,14 @@
+{
+  "title": "Thêm người dùng mới",
+  "nameLabel": "Tên người dùng",
+  "namePlaceholder": "Nhập tên người dùng",
+  "nameRequired": "Vui lòng nhập tên",
+  "emailLabel": "Email người dùng",
+  "emailPlaceholder": "Nhập email người dùng",
+  "emailRequired": "Vui lòng nhập email",
+  "emailInvalid": "Email không hợp lệ",
+  "submitButton": "Thêm người dùng",
+  "submittingButton": "Đang thêm...",
+  "success": "Thêm người dùng thành công",
+  "error": "Thêm người dùng thất bại"
+}

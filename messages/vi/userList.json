@@ -1,0 +1,11 @@
+{
+  "title": "Danh sách người dùng",
+  "empty": "Chưa có người dùng nào",
+  "noResults": "Không tìm thấy người dùng nào với \"{search}\"",
+  "deleteConfirmTitle": "Xoá người dùng?",
+  "deleteConfirmDesc": "Bạn có chắc muốn xoá người dùng này?",
+  "deleteButton": "Xoá",
+  "cancelButton": "Huỷ",
+  "deleteSuccess": "Xoá thành công",
+  "deleteError": "Xoá thất bại"
+}

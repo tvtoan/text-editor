@@ -1,0 +1,7 @@
+{
+  "appTitle": "User Manager",
+  "searchPlaceholder": "Search by name...",
+  "searchButton": "Search",
+  "loading": "Loading...",
+  "error": "Error loading data!"
+}

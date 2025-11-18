@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Modal, Input, Space, Button, message } from 'antd';
+import { Modal, Input, Space, Button, message, Select } from 'antd';
 import TiptapEditor from '../editor/TiptapEditor';
 import { useCreateArticle, useUpdateArticle } from '@/app/hooks/tiptap/useArticles';
 import { Article, ArticleStatus } from '@/app/types/tiptap/article';
@@ -21,8 +21,16 @@ export default function ArticleModal({ open, onCancel, article }: ArticleModalPr
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
 
-  // Khi article thay đổi, set lại state
+  // Reset form khi mở/đóng modal hoặc đổi bài
   useEffect(() => {
+    if (!open) {
+      setTitle('');
+      setContent('');
+      setAuthor('');
+      setStatus('draft');
+      return;
+    }
+
     if (article) {
       setTitle(article.title);
       setContent(article.content);
@@ -34,15 +42,24 @@ export default function ArticleModal({ open, onCancel, article }: ArticleModalPr
       setAuthor('');
       setStatus('draft');
     }
-  }, [article]);
+  }, [open, article]);
 
   const handleSave = (): void => {
     if (!title.trim()) {
       message.error('Vui lòng nhập tiêu đề!');
       return;
     }
+    if (!author.trim()) {
+      message.error('Vui lòng nhập tác giả!');
+      return;
+    }
 
-    const articleData = { title, content, author, status };
+    const articleData = {
+      title: title.trim(),
+      content: content.trim(),
+      author: author.trim(),
+      status,
+    };
 
     if (article) {
       updateMutation.mutate(
@@ -52,6 +69,9 @@ export default function ArticleModal({ open, onCancel, article }: ArticleModalPr
             message.success('Cập nhật bài viết thành công!');
             onCancel();
           },
+          onError: () => {
+            message.error('Cập nhật thất bại!');
+          },
         }
       );
     } else {
@@ -60,59 +80,80 @@ export default function ArticleModal({ open, onCancel, article }: ArticleModalPr
           message.success('Tạo bài viết thành công!');
           onCancel();
         },
+        onError: () => {
+          message.error('Tạo bài viết thất bại!');
+        },
       });
     }
   };
+
+  const handleCancel = () => {
+    onCancel();
+  };
+
+  // Key để force remount TiptapEditor khi đổi bài → cực kỳ quan trọng!
+  const editorKey = article ? `edit-${article.id}` : 'new';
 
   return (
     <Modal
       title={article ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
       open={open}
-      onCancel={onCancel}
-      width={1000}
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          Hủy
-        </Button>,
-        <Button
-          key="save"
-          type="primary"
-          onClick={handleSave}
-          loading={createMutation.isPending || updateMutation.isPending}
-        >
-          Lưu
-        </Button>,
-      ]}
+      onCancel={handleCancel}
+      width={1100}
+      footer={null}
+      destroyOnHidden
+      maskClosable={false}
     >
       <Space direction="vertical" style={{ width: '100%' }} size="large">
         <Input
-          placeholder="Tiêu đề bài viết"
+          placeholder="Tiêu đề bài viết *"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           size="large"
+          allowClear
         />
 
-        <Input placeholder="Tác giả" value={author} onChange={(e) => setAuthor(e.target.value)} />
+        <Space>
+          <Input
+            placeholder="Tác giả *"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            style={{ width: 300 }}
+            allowClear
+          />
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as ArticleStatus)}
-          style={{
-            padding: '8px',
-            borderRadius: '6px',
-            border: '1px solid #d9d9d9',
-            width: '200px',
-          }}
-        >
-          <option value="draft">Nháp</option>
-          <option value="published">Đã xuất bản</option>
-        </select>
+          <Select
+            value={status}
+            onChange={(value) => setStatus(value as ArticleStatus)}
+            style={{ width: 200 }}
+            options={[
+              { value: 'draft', label: 'Bản nháp' },
+              { value: 'published', label: 'Đã xuất bản' },
+            ]}
+          />
+        </Space>
 
-        <TiptapEditor
-          key={article ? article.id : 'new'} // remount editor khi đổi bài
-          content={content}
-          onChange={setContent}
-        />
+        <div style={{ border: '1px solid #d9d9d9', borderRadius: 8, overflow: 'hidden' }}>
+          <TiptapEditor
+            key={editorKey} // Force remount khi đổi bài
+            content={content}
+            onChange={setContent}
+          />
+        </div>
+
+        <div style={{ textAlign: 'right', marginTop: 16 }}>
+          <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+            Hủy
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSave}
+            loading={createMutation.isPending || updateMutation.isPending}
+            disabled={!title.trim() || !author.trim()}
+          >
+            {article ? 'Cập nhật' : 'Tạo mới'}
+          </Button>
+        </div>
       </Space>
     </Modal>
   );

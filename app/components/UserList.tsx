@@ -9,6 +9,7 @@ export default function UserList({ page, search }: { page: number; search: strin
   const tCommon = useTranslations('common');
   const { data, isLoading, isError } = useUsers(page, search);
   const deleteUser = useDeleteUser();
+  const [messageApi, contextHolder] = message.useMessage();
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 5 }} />;
   if (isError) return <p className="text-red-500 text-center">{tCommon('error')}</p>;
@@ -18,8 +19,8 @@ export default function UserList({ page, search }: { page: number; search: strin
 
   const handleDelete = (id: number) => {
     deleteUser.mutate(id, {
-      onSuccess: () => message.success(t('deleteSuccess')),
-      onError: () => message.error(t('deleteError')),
+      onSuccess: () => messageApi.success(t('deleteSuccess')),
+      onError: () => messageApi.error(t('deleteError')),
     });
   };
 

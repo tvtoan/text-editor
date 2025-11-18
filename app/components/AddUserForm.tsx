@@ -8,21 +8,23 @@ export default function AddUserForm() {
   const [form] = useForm();
   const t = useTranslations('addUser');
   const addUser = useAddUser();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = (value: { name: string; email: string }) => {
     addUser.mutate(value, {
       onSuccess: () => {
-        message.success(t('success'));
+        messageApi.success(t('success'));
         form.resetFields();
       },
       onError: () => {
-        message.error(t('error'));
+        messageApi.error(t('error'));
       },
     });
   };
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
+      {contextHolder}
       <Form.Item
         label={t('nameLabel')}
         name="name"

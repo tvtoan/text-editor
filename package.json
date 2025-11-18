@@ -21,6 +21,7 @@
     "@ckeditor/ckeditor5-font": "^41.4.2",
     "@ckeditor/ckeditor5-heading": "^41.4.2",
     "@ckeditor/ckeditor5-react": "^11.0.0",
+    "@syncfusion/ej2-react-richtexteditor": "^31.2.10",
     "@tanstack/react-query": "^5.90.7",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tiptap/extension-color": "^3.10.7",
@@ -40,6 +41,7 @@
     "react": "^19.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^19.2.0",
+    "suneditor-react": "^3.6.1",
     "uuid": "^13.0.0",
     "zustand": "^5.0.8"
   },

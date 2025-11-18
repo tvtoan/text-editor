@@ -18,7 +18,7 @@ export default function ArticleManagementPage() {
   const [editorVisible, setEditorVisible] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
-  const [messageApi] = message.useMessage();
+  const [messageApi, contextHolder] = message.useMessage();
 
   // Sync data từ API vào Zustand store
   useEffect(() => {
@@ -68,6 +68,7 @@ export default function ArticleManagementPage() {
 
   return (
     <div style={{ padding: 24, backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      {contextHolder}
       <Card
         title={<div style={{ fontSize: 20, fontWeight: 600 }}>📚 Quản lý bài viết</div>}
         extra={

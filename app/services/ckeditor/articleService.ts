@@ -1,4 +1,4 @@
-import { MOCK_ARTICLES } from '@/constants/mockData';
+import { MOCK_ARTICLES } from '@/constants/ckeditor/mockData';
 import type { Article } from '../../types/ckeditor/article';
 
 export const articleService = {

@@ -14,6 +14,7 @@ export function ArticleEditorModal({ visible, article, onClose, onSave }: Articl
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
+  const [messageApi] = message.useMessage();
 
   useEffect(() => {
     if (article) {
@@ -29,7 +30,7 @@ export function ArticleEditorModal({ visible, article, onClose, onSave }: Articl
 
   const handleSave = () => {
     if (!title.trim() || !content.trim() || !author.trim()) {
-      message.error('Vui lòng điền đầy đủ thông tin!');
+      messageApi.error('Vui lòng điền đầy đủ thông tin!');
       return;
     }
 

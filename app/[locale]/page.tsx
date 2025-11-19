@@ -2,7 +2,7 @@
 
 import { Button, Card, Typography } from 'antd';
 import { ArrowRightOutlined, EditOutlined } from '@ant-design/icons';
-import LanguageSwitcher from '../components/LanguageSwitcher';
+// import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const { Title, Paragraph } = Typography;
 
@@ -15,7 +15,7 @@ export default function Page() {
           <Title level={2} className="!mb-0 text-gray-800">
             Text Editor Hub
           </Title>
-          <LanguageSwitcher />
+          {/* <LanguageSwitcher /> */}
         </div>
 
         {/* Intro Card */}
@@ -42,32 +42,47 @@ export default function Page() {
 
         {/* Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-          <Card className="shadow rounded-xl text-center py-4">
+          <Card className="shadow rounded-xl p-6 flex flex-col items-center text-center h-full">
             <Title level={4}>SlateJS</Title>
-            <Paragraph className="text-gray-600 text-sm">
+            <Paragraph className="text-gray-600 text-sm flex-1 min-h-[80px]">
               Editor linh hoạt dùng schema, phù hợp tùy chỉnh sâu.
             </Paragraph>
-            <Button type="primary" href="/editor/slateJs" icon={<ArrowRightOutlined />}>
+            <Button
+              type="primary"
+              href="/editor/slateJs"
+              icon={<ArrowRightOutlined />}
+              className="mt-auto"
+            >
               Trải nghiệm
             </Button>
           </Card>
 
-          <Card className="shadow rounded-xl text-center py-4">
+          <Card className="shadow rounded-xl p-6 flex flex-col items-center text-center h-full">
             <Title level={4}>Tiptap</Title>
-            <Paragraph className="text-gray-600 text-sm">
+            <Paragraph className="text-gray-600 text-sm flex-1 min-h-[80px]">
               Editor hiện đại dựa trên ProseMirror, nhiều extension mạnh mẽ.
             </Paragraph>
-            <Button type="primary" href="/editor/tiptap" icon={<ArrowRightOutlined />}>
+            <Button
+              type="primary"
+              href="/editor/tiptap"
+              icon={<ArrowRightOutlined />}
+              className="mt-auto"
+            >
               Trải nghiệm
             </Button>
           </Card>
 
-          <Card className="shadow rounded-xl text-center py-4">
+          <Card className="shadow rounded-xl p-6 flex flex-col items-center text-center h-full">
             <Title level={4}>SunEditor</Title>
-            <Paragraph className="text-gray-600 text-sm">
+            <Paragraph className="text-gray-600 text-sm flex-1 min-h-[80px]">
               Editor dễ dùng, toolbar đẹp, nhiều tính năng media.
             </Paragraph>
-            <Button type="primary" href="/editor/sunEditor" icon={<ArrowRightOutlined />}>
+            <Button
+              type="primary"
+              href="/editor/sunEditor"
+              icon={<ArrowRightOutlined />}
+              className="mt-auto"
+            >
               Trải nghiệm
             </Button>
           </Card>

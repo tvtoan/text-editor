@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useArticleStore } from '@/app/store/ckeditor/articleStore';

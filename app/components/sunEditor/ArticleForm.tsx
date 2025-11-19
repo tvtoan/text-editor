@@ -14,7 +14,6 @@ interface ArticleFormProps {
 export function ArticleForm({ open, onCancel, onSubmit, initialValues }: ArticleFormProps) {
   const [form] = Form.useForm();
   const editorRef = useRef<any>(null);
-
   useEffect(() => {
     if (open) {
       if (initialValues) {

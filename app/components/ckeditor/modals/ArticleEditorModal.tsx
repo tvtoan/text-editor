@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button, message, Input } from 'antd';
 import { CKEditorWrapper } from '../editor/CKEditorWrapper';
 import type { Article } from '../../../types/ckeditor/article';

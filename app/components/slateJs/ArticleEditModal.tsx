@@ -77,6 +77,7 @@ export const ArticleEditorModal: React.FC<Props> = ({
       }
 
       setValue(parsed);
+      console.log('update data:', article);
 
       // Quan trọng: reset hoàn toàn editor để tránh lẫn dữ liệu cũ
       editor.children = parsed;
@@ -164,6 +165,12 @@ export const ArticleEditorModal: React.FC<Props> = ({
     }
 
     onSave({
+      title: title.trim(),
+      content: JSON.stringify(value),
+      author: author.trim(),
+      status,
+    });
+    console.log(' post data', {
       title: title.trim(),
       content: JSON.stringify(value),
       author: author.trim(),

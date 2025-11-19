@@ -14,6 +14,7 @@ export const ArticleViewModal: React.FC<ArticleViewModalProps> = ({
   onClose,
 }) => {
   if (!article) return null;
+  console.log('detail post', article);
 
   const parseContent = (content: string) => {
     try {

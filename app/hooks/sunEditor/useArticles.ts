@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { articleService } from '@/app/services/sunEditor/articlesService';
 import { useArticleStore } from '@/app/store/sunEditor/articleStore';
-import { Article, CreateArticle, UpdateArticle } from '@/app/types/sunEditor/article';
+import { CreateArticle, UpdateArticle } from '@/app/types/sunEditor/article';
 import { useEffect } from 'react';
 
 export const useArticles = () => {

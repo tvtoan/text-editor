@@ -10,7 +10,7 @@ type SunEditorCoreProps = {
   onChange: (content: string) => void;
   placeholder?: string;
   message?: MessageInstance;
-  readOnly?: boolean; // thêm prop readOnly
+  readOnly?: boolean;
 };
 
 export default function SunEditorCore({

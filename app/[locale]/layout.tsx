@@ -1,14 +1,15 @@
 import '@ant-design/v5-patch-for-react-19';
-import '../globals.css';
 import 'antd/dist/reset.css';
+import '../globals.css';
+
 import ReactQueryProvider from '../providers/ReactQueryProvider';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 
 export const metadata = {
-  title: 'User Manager',
-  description: 'React Query Demo with Next.js 16',
+  title: 'Text Editor Hub',
+  description: 'Editor demo: SlateJS, Tiptap, SunEditor',
 };
 
 export default async function RootLayout({
@@ -24,9 +25,9 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="vi">
+    <html lang={locale}>
       <body className="bg-gray-50">
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale}>
           <ReactQueryProvider>{children}</ReactQueryProvider>
         </NextIntlClientProvider>
       </body>

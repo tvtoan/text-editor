@@ -25,6 +25,7 @@ export const ArticleList: React.FC<ArticleListProps> = ({
   if (isLoading) {
     return <div style={{ padding: '20px', textAlign: 'center' }}>Đang tải...</div>;
   }
+  console.log('data list', articles);
 
   return (
     <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>

@@ -12,6 +12,8 @@ export default function ArticleDetail() {
   const { data: article, isLoading } = useArticle(selectedArticleId);
 
   const open = !!selectedArticleId;
+  if (!article) return;
+  console.log('detail post', article);
 
   return (
     <Modal

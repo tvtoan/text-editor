@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Space, Popover } from 'antd';
 import { Editor } from '@tiptap/react';
 import { SketchPicker } from 'react-color';
@@ -14,11 +14,31 @@ export default function MenuBar({ editor }: MenuBarProps) {
 
   if (!editor) return null;
 
-  const addImage = (): void => {
+  // Chèn ảnh từ URL
+  const addImageFromUrl = (): void => {
     const url = prompt('Nhập URL hình ảnh:');
     if (url) {
       editor.chain().focus().setImage({ src: url }).run();
     }
+  };
+
+  // Chèn ảnh từ máy tính
+  const addImageFromFile = (): void => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const src = e.target?.result as string;
+          editor.chain().focus().setImage({ src }).run();
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   };
 
   const addYoutubeVideo = (): void => {
@@ -38,15 +58,11 @@ export default function MenuBar({ editor }: MenuBarProps) {
   };
 
   const setFontFamily = (font: string): void => {
-    if (font) {
-      editor.chain().focus().setFontFamily(font).run();
-    }
+    if (font) editor.chain().focus().setFontFamily(font).run();
   };
 
   const setFontSize = (size: string): void => {
-    if (size) {
-      editor.chain().focus().setFontSize(size).run();
-    }
+    if (size) editor.chain().focus().setFontSize(size).run();
   };
 
   return (
@@ -90,7 +106,7 @@ export default function MenuBar({ editor }: MenuBarProps) {
             cursor: 'pointer',
           }}
         >
-          <option value=""> Size</option>
+          <option value="">Size</option>
           <option value="12px">12</option>
           <option value="14px">14</option>
           <option value="16px">16</option>
@@ -171,8 +187,11 @@ export default function MenuBar({ editor }: MenuBarProps) {
         </Button>
 
         {/* Media */}
-        <Button size="small" onClick={addImage}>
-          🖼️ Image
+        <Button size="small" onClick={addImageFromUrl}>
+          🖼️ Image URL
+        </Button>
+        <Button size="small" onClick={addImageFromFile}>
+          📁 Upload Image
         </Button>
         <Button size="small" onClick={addYoutubeVideo}>
           YouTube

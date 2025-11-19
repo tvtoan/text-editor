@@ -17,6 +17,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   const editorRef = useRef<any>(null);
 
   if (!article) return null;
+  console.log('detail data', article);
 
   return (
     <Modal

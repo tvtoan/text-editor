@@ -19,14 +19,19 @@ export default function ArticlesPage() {
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  console.log('list post', articles);
+
   const handleSubmit = async (values: CreateArticle) => {
     try {
       if (editingArticle) {
         const dto: UpdateArticle = { id: editingArticle.id, data: values };
         await update(dto);
+        console.log('update data', dto);
         messageApi.success('Cập nhật bài viết thành công!');
       } else {
         await create(values);
+        console.log('create data', values);
+
         messageApi.success('Tạo bài viết thành công!');
       }
       setOpenForm(false);
@@ -48,21 +53,25 @@ export default function ArticlesPage() {
   };
 
   return (
-    <PageContainer title="Quản lý Bài viết" loading={isLoading}>
+    <PageContainer
+      title="Quản lý Bài viết"
+      extra={[
+        <Button
+          key="add"
+          type="primary"
+          size="large"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            setEditingArticle(null);
+            setOpenForm(true);
+          }}
+        >
+          Thêm bài viết
+        </Button>,
+      ]}
+      loading={isLoading}
+    >
       {contextHolder}
-
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        style={{ marginBottom: 16 }}
-        onClick={() => {
-          setEditingArticle(null);
-          setOpenForm(true);
-        }}
-      >
-        Thêm bài viết
-      </Button>
-
       {/* Grid container */}
       <div
         style={{

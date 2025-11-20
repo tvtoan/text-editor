@@ -2,7 +2,6 @@
 
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import SunEditorCore from './SunEditorCore';
-import { message as antdMessage } from 'antd';
 
 interface SunEditorWrapperProps {
   value?: string;
@@ -27,7 +26,6 @@ export const SunEditorWrapper = forwardRef<any, SunEditorWrapperProps>(
         content={value}
         onChange={onChange}
         placeholder={placeholder}
-        message={antdMessage}
       />
     );
   }

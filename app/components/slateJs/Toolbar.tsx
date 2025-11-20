@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ColorPicker, Select, Divider } from 'antd';
+import { Button, ColorPicker, Select, Divider, message, Upload } from 'antd';
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -9,6 +9,7 @@ import {
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import { Editor } from 'slate';
+import axios from 'axios';
 
 interface ToolbarProps {
   editor: Editor;
@@ -17,12 +18,11 @@ interface ToolbarProps {
   onInsertYoutube: () => void;
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({
-  editor,
-  onInsertImage,
-  onInsertVideo,
-  onInsertYoutube,
-}) => {
+const CLOUDINARY_CLOUD_NAME = 'donbgiqo5';
+const CLOUDINARY_UPLOAD_PRESET = 'text_editor';
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+
+export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertYoutube }) => {
   const [color, setColor] = useState('#000000');
   const [fontSize, setFontSize] = useState('16px');
   const [fontFamily, setFontFamily] = useState('Arial');
@@ -49,6 +49,53 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const applyFontFamily = (family: string) => {
     setFontFamily(family);
     Editor.addMark(editor, 'fontFamily', family);
+  };
+
+  const uploadToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    try {
+      const res = await axios.post(CLOUDINARY_UPLOAD_URL, formData);
+      return res.data.secure_url; // URL trả về từ Cloudinary
+    } catch (err) {
+      message.error('Upload thất bại');
+      console.error(err);
+      return null;
+    }
+  };
+
+  const onInsertImage = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      if (!input.files?.length) return;
+      const file = input.files[0];
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        // chèn vào editor
+        Editor.insertText(editor, `![image](${url})`);
+      }
+    };
+    input.click();
+  };
+
+  const onInsertVideo = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.onchange = async () => {
+      if (!input.files?.length) return;
+      const file = input.files[0];
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        // chèn vào editor
+        Editor.insertText(editor, `[video](${url})`);
+      }
+    };
+    input.click();
   };
 
   return (

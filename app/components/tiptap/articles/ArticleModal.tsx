@@ -69,6 +69,7 @@ export default function ArticleModal({ open, onCancel, article }: ArticleModalPr
         {
           onSuccess: () => {
             messageApi.success('Cập nhật bài viết thành công!');
+            console.log('update data', articleData);
             onCancel();
           },
           onError: () => {

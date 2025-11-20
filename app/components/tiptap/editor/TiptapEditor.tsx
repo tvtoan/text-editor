@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
+import { Video } from './Video';
 import Youtube from '@tiptap/extension-youtube';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { FontSize } from '@tiptap/extension-text-style';
@@ -38,6 +39,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         width: 640,
         height: 480,
       }),
+      Video,
       TextStyle,
       FontSize,
       Color,

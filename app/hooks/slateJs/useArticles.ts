@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { message } from 'antd';
 import { articleService } from '@/app/services/slateJs/articleService';
 import { useEditorStore } from '@/app/store/slateJs/articleStore';
 import { CreateArticle, UpdateArticle } from '@/app/types/slateJs/article';
@@ -30,10 +29,6 @@ export const useArticles = () => {
     onSuccess: (newArticle) => {
       addArticle(newArticle);
       queryClient.invalidateQueries({ queryKey: ['articles'] });
-      message.success('Tạo bài viết thành công!');
-    },
-    onError: () => {
-      message.error('Tạo bài viết thất bại!');
     },
   });
 
@@ -44,10 +39,6 @@ export const useArticles = () => {
       updateArticle(updatedArticle.id, updatedArticle);
       setCurrentArticle(updatedArticle);
       queryClient.invalidateQueries({ queryKey: ['articles'] });
-      message.success('Cập nhật bài viết thành công!');
-    },
-    onError: () => {
-      message.error('Cập nhật bài viết thất bại!');
     },
   });
 
@@ -58,10 +49,6 @@ export const useArticles = () => {
       deleteArticle(id);
       setCurrentArticle(null);
       queryClient.invalidateQueries({ queryKey: ['articles'] });
-      message.success('Xóa bài viết thành công!');
-    },
-    onError: () => {
-      message.error('Xóa bài viết thất bại!');
     },
   });
 

@@ -4,25 +4,12 @@ import { useState } from 'react';
 import { Button, Space, Popover, message } from 'antd';
 import { Editor } from '@tiptap/react';
 import { SketchPicker } from 'react-color';
+import { uploadToCloudinary } from '@/app/lib/cloudinary';
+import { getOptimizedImageUrl, getOptimizedVideoUrl, getVideoPosterUrl } from '@/app/lib/optimized';
 
 interface MenuBarProps {
   editor: Editor | null;
 }
-
-const CLOUDINARY_CLOUD_NAME = 'donbgiqo5';
-const CLOUDINARY_UPLOAD_PRESET = 'text_editor';
-
-// Tối ưu video URL (Cloudinary)
-const getOptimizedVideoUrl = (originalUrl: string): string => {
-  return originalUrl.replace('/upload/', '/upload/f_auto,q_auto:eco,vc_auto/');
-};
-
-// Tối ưu poster từ frame đầu tiên của video (Cloudinary)
-const getVideoPosterUrl = (videoUrl: string): string => {
-  return videoUrl
-    .replace('/upload/', '/upload/w_800,h_450,c_fill,g_center,q_auto:good,fl_getframe/first/')
-    .replace(/\.(mp4|webm|ogg|mov)$/i, '.jpg');
-};
 
 export default function MenuBar({ editor }: MenuBarProps) {
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
@@ -32,90 +19,73 @@ export default function MenuBar({ editor }: MenuBarProps) {
 
   if (!editor) return null;
 
-  // Upload file Cloudinary
-  const uploadFile = async (file: File): Promise<string | null> => {
-    setUploading(true);
-    messageApi.loading({ content: 'Đang upload...', key: 'upload', duration: 0 });
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-    const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
-
-    try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.secure_url) {
-        messageApi.success({ content: 'Upload thành công!', key: 'upload', duration: 2 });
-        return data.secure_url;
-      } else {
-        throw new Error(data.error?.message || 'Upload thất bại');
-      }
-    } catch (err: any) {
-      messageApi.error({ content: err.message || 'Upload thất bại!', key: 'upload', duration: 3 });
-      console.error('Upload error:', err);
-      return null;
-    } finally {
-      setUploading(false);
-    }
-  };
-
   // Upload ảnh từ máy
   const addImageFromFile = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/jpeg,image/png,image/gif,image/webp,image/avif';
+
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
 
-      const url = await uploadFile(file);
-      if (url) {
-        const optimizedImg = url.replace('/upload/', '/upload/q_auto:eco,f_auto,w_auto,dpr_auto/');
+      setUploading(true);
+      try {
+        const result = await uploadToCloudinary(file, { resourceType: 'image' });
+        if (!result?.url) throw new Error('Upload ảnh thất bại');
+
+        const optimizedImg = getOptimizedImageUrl(result.url);
         editor.chain().focus().setImage({ src: optimizedImg, alt: file.name }).run();
+        messageApi.success('Đã thêm ảnh!');
+      } catch (err: any) {
+        messageApi.error(err.message || 'Tải ảnh lên thất bại');
+      } finally {
+        setUploading(false);
       }
     };
+
     input.click();
   };
 
-  // Upload video từ máy — Dùng Video.ts node
   const addVideoFromFile = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'video/mp4,video/webm,video/ogg,video/quicktime,video/x-m4v';
+    input.accept = 'video/mp4,video/webm,video/ogg,video/quicktime';
+
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
 
       if (file.size > 100 * 1024 * 1024) {
-        messageApi.error('Video quá lớn! Tối đa 100MB với tài khoản miễn phí');
+        messageApi.error('Video quá lớn! Tối đa 100MB');
         return;
       }
 
-      const url = await uploadFile(file);
-      if (url) {
-        const optimizedVideoUrl = getOptimizedVideoUrl(url);
-        const posterUrl = getVideoPosterUrl(url);
+      setUploading(true);
+      try {
+        const result = await uploadToCloudinary(file, { resourceType: 'video' });
+        if (!result?.url) throw new Error('Upload video thất bại');
+
+        const optimizedVideo = getOptimizedVideoUrl(result.url);
+        const poster = getVideoPosterUrl(result.url);
 
         editor
           .chain()
           .focus()
           .setVideo({
-            src: optimizedVideoUrl,
-            poster: posterUrl,
+            src: optimizedVideo,
+            poster,
           })
           .run();
+
+        messageApi.success('Đã thêm video!');
+      } catch (err: any) {
+        messageApi.error('Tải video lên thất bại');
+      } finally {
+        setUploading(false);
       }
     };
+
     input.click();
   };
 
@@ -123,13 +93,10 @@ export default function MenuBar({ editor }: MenuBarProps) {
   const addImageFromUrl = () => {
     const url = prompt('Nhập URL hình ảnh:');
     if (url?.trim()) {
-      const optimized = url.includes('cloudinary.com')
-        ? url.replace('/upload/', '/upload/q_auto:eco,f_auto/')
-        : url.trim();
+      const optimized = getOptimizedImageUrl(url.trim());
       editor.chain().focus().setImage({ src: optimized }).run();
     }
   };
-
   // Nhúng YouTube
   const addYoutubeVideo = () => {
     const url = prompt('Nhập URL video YouTube:');

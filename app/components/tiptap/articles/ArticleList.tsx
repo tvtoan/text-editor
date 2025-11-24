@@ -1,104 +1,144 @@
+'use client';
+
 import { useState } from 'react';
-import { Button, List, Card, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Card, Tag, Avatar, Popconfirm, message } from 'antd';
+import { PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useArticles } from '@/app/hooks/tiptap/useArticles';
 import { useArticleStore } from '@/app/store/tiptap/useArticleStore';
 import ArticleModal from './ArticleModal';
 import { Article } from '@/app/types/tiptap/article';
+import { useDeleteArticle } from '@/app/hooks/tiptap/useArticles';
 
 export default function ArticleList() {
   const { data: articles, isLoading } = useArticles();
   const { setSelectedArticleId } = useArticleStore();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
+  const deleteMutation = useDeleteArticle();
 
-  const handleEdit = (article: Article): void => {
+  const handleEdit = (article: Article) => {
     setEditingArticle(article);
     setIsModalOpen(true);
   };
 
-  const handleCreate = (): void => {
+  const handleCreate = () => {
     setEditingArticle(null);
     setIsModalOpen(true);
   };
 
+  const handleDelete = async (id: string) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        messageApi.success('Xóa bài viết thành công!');
+      },
+      onError: (error: any) => {
+        messageApi.error(error?.message || 'Xóa bài viết thất bại, vui lòng thử lại!');
+      },
+    });
+  };
+
   if (isLoading) {
-    return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải...</div>;
+    return (
+      <div style={{ padding: 50, textAlign: 'center', fontSize: 18 }}>Đang tải bài viết...</div>
+    );
   }
 
   return (
-    <PageContainer>
+    <PageContainer title="Quản lý Bài viết (Tiptap)">
+      {contextHolder}
+
       <div
         style={{
+          marginBottom: 20,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 16,
         }}
       >
-        <h2 style={{ margin: 0 }}>Quản lý Bài viết</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+        <h2 style={{ margin: 0 }}>Danh sách bài viết</h2>
+        <Button type="primary" size="large" icon={<PlusOutlined />} onClick={handleCreate}>
           Tạo bài viết mới
         </Button>
       </div>
 
-      <List
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 1,
-          md: 1,
-          lg: 1,
-          xl: 2,
-          xxl: 3,
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(480px, 1fr))',
+          gap: 20,
         }}
-        dataSource={articles}
-        renderItem={(article) => (
-          <List.Item>
-            <Card
-              styles={{ body: { padding: 16, minHeight: 200 } }}
-              actions={[
-                <EyeOutlined key="view" onClick={() => setSelectedArticleId(article.id)} />,
-                <EditOutlined key="edit" onClick={() => handleEdit(article)} />,
-              ]}
-            >
-              <div style={{ display: 'flex', gap: 16 }}>
-                {/* Left side: title, author, status */}
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  <h3 style={{ margin: '0 0 8px 0' }}>{article.title}</h3>
-                  <Tag color={article.status === 'published' ? 'green' : 'orange'}>
-                    {article.status === 'published' ? 'Đã xuất bản' : 'Nháp'}
-                  </Tag>
-                  <div style={{ marginTop: 12, fontSize: 12, color: '#999' }}>
-                    👤 {article.author} • 📅 {article.createdAt}
-                  </div>
-                </div>
-
-                {/* Right side: content */}
-                <div
-                  style={{
-                    flex: 2,
-                    fontSize: 14,
-                    color: '#595959',
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 5,
-                    WebkitBoxOrient: 'vertical',
-                    lineHeight: 1.6,
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: article.content
-                      .replace(/<[^>]*>/g, ' ')
-                      .replace(/\s+/g, ' ')
-                      .trim(),
-                  }}
-                />
+      >
+        {articles?.map((article) => (
+          <Card
+            key={article.id}
+            hoverable
+            title={<span style={{ fontSize: 18, fontWeight: 600 }}>{article.title}</span>}
+            extra={
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Button
+                  size="small"
+                  icon={<EyeOutlined />}
+                  onClick={() => setSelectedArticleId(article.id)}
+                >
+                  Xem
+                </Button>
+                <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(article)}>
+                  Sửa
+                </Button>
+                <Popconfirm
+                  title="Xóa bài viết này?"
+                  onConfirm={() => handleDelete(article.id)}
+                  okText="Xóa"
+                  cancelText="Hủy"
+                >
+                  <Button size="small" danger icon={<DeleteOutlined />}>
+                    Xóa
+                  </Button>
+                </Popconfirm>
               </div>
-            </Card>
-          </List.Item>
-        )}
-      />
+            }
+          >
+            <div style={{ display: 'flex', gap: 20 }}>
+              {/* CỘT TRÁI: Thông tin */}
+              <div style={{ flex: 1, minWidth: 140 }}>
+                <p style={{ margin: '8px 0' }}>
+                  <strong>Tác giả:</strong> <Avatar size="small" style={{ marginRight: 6 }} />
+                  {article.author}
+                </p>
+                <Tag
+                  color={article.status === 'published' ? 'success' : 'warning'}
+                  style={{ marginBottom: 8 }}
+                >
+                  {article.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                </Tag>
+                <p style={{ color: '#888', fontSize: 13 }}>
+                  {new Date(article.createdAt).toLocaleDateString('vi-VN')}
+                </p>
+              </div>
+
+              {/* CỘT PHẢI: Preview nội dung */}
+              <div
+                style={{
+                  flex: 2,
+                  minHeight: 220,
+                  maxHeight: 280,
+                  overflow: 'hidden',
+                  borderLeft: '1px solid #f0f0f0',
+                  paddingLeft: 16,
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  color: '#333',
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: article.content,
+                }}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
 
       <ArticleModal
         open={isModalOpen}

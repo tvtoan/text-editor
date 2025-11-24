@@ -1,4 +1,3 @@
-// src/app/features/articles/services/articleService.ts
 import { MOCK_ARTICLES } from '@/constants/sunEditor/mockData';
 import { Article, CreateArticle, UpdateArticle } from '@/app/types/sunEditor/article';
 

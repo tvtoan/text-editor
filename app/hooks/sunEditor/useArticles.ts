@@ -45,7 +45,7 @@ export const useArticles = () => {
   });
 
   return {
-    articles, // Trả về từ Zustand store
+    articles,
     isLoading,
     create: (data: CreateArticle) => createMutation.mutate(data),
     update: (dto: UpdateArticle) => updateMutation.mutate(dto),

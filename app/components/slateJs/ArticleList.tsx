@@ -1,6 +1,12 @@
 import React from 'react';
-import { Card, Row, Col, Button, Tag, Popconfirm, Space } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Card, Button, Tag, Popconfirm, Space, Avatar } from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Article } from '@/app/types/slateJs/article';
 
 interface ArticleListProps {
@@ -10,7 +16,7 @@ interface ArticleListProps {
   onEdit: (article: Article) => void;
   onDelete: (id: string) => void;
   onCreate: () => void;
-  isDeleting: boolean;
+  isDeleting?: boolean;
 }
 
 export const ArticleList: React.FC<ArticleListProps> = ({
@@ -20,112 +26,118 @@ export const ArticleList: React.FC<ArticleListProps> = ({
   onEdit,
   onDelete,
   onCreate,
-  isDeleting,
+  isDeleting = false,
 }) => {
   if (isLoading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Đang tải...</div>;
+    return (
+      <div style={{ padding: 60, textAlign: 'center', fontSize: 18 }}>Đang tải bài viết...</div>
+    );
   }
   console.log('data list', articles);
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '24px', background: '#f9f9f9', minHeight: '100vh' }}>
       <div
         style={{
-          marginBottom: '24px',
+          maxWidth: '1400px',
+          margin: '0 auto 32px auto',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: '28px' }}>Danh sách bài viết</h1>
-        <Button type="primary" icon={<PlusOutlined />} size="large" onClick={onCreate}>
+        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600 }}>Quản lý Bài viết (Slate.js)</h1>
+        <Button type="primary" size="large" icon={<PlusOutlined />} onClick={onCreate}>
           Tạo bài viết mới
         </Button>
       </div>
 
-      <Row gutter={[16, 16]}>
+      <div
+        style={{
+          maxWidth: '1400px',
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(480px, 1fr))',
+          gap: 24,
+        }}
+      >
         {articles.map((article) => (
-          <Col xs={24} sm={12} lg={8} key={article.id}>
-            <Card
-              hoverable
-              title={
-                <div
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {article.title}
-                </div>
-              }
-              extra={
-                <Tag color={article.status === 'published' ? 'green' : 'orange'}>
-                  {article.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
-                </Tag>
-              }
-            >
-              {/* Tác giả */}
-              <div style={{ color: '#666', fontSize: '12px', marginBottom: '4px' }}>
-                Tác giả: {article.author}
-              </div>
-
-              {/* Ngày tạo - Ngày cập nhật */}
-              <div style={{ color: '#999', fontSize: '12px', marginBottom: '4px' }}>
-                Ngày tạo: {new Date(article.createdAt).toLocaleDateString('vi-VN')}
-                {article.updatedAt
-                  ? ` - Cập nhật: ${new Date(article.updatedAt).toLocaleDateString('vi-VN')}`
-                  : ''}
-              </div>
-
-              {/* Content */}
-              <div
-                style={{
-                  color: '#333',
-                  fontSize: '14px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  marginBottom: '20px',
-                }}
-              >
-                {/* Lấy text từ Slate JSON */}
-                {(() => {
-                  try {
-                    const parsed = JSON.parse(article.content);
-                    return parsed
-                      .map((node: any) => node.children.map((child: any) => child.text).join(''))
-                      .join(' ');
-                  } catch {
-                    return article.content;
-                  }
-                })()}
-              </div>
-
-              <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-                <Button type="default" icon={<EyeOutlined />} onClick={() => onView(article)}>
+          <Card
+            key={article.id}
+            hoverable
+            title={<span style={{ fontSize: 20, fontWeight: 600 }}>{article.title}</span>}
+            extra={
+              <Space>
+                <Button size="small" icon={<EyeOutlined />} onClick={() => onView(article)}>
                   Xem
                 </Button>
-                <Button type="primary" icon={<EditOutlined />} onClick={() => onEdit(article)}>
+                <Button
+                  size="small"
+                  type="primary"
+                  icon={<EditOutlined />}
+                  onClick={() => onEdit(article)}
+                >
                   Sửa
                 </Button>
                 <Popconfirm
-                  title="Xóa bài viết"
-                  description="Bạn có chắc chắn muốn xóa bài viết này?"
+                  title="Xóa bài viết này?"
+                  description="Hành động này không thể hoàn tác."
                   onConfirm={() => onDelete(article.id)}
                   okText="Xóa"
                   cancelText="Hủy"
-                  okButtonProps={{ danger: true }}
                 >
-                  <Button danger icon={<DeleteOutlined />} loading={isDeleting}>
+                  <Button size="small" danger icon={<DeleteOutlined />} loading={isDeleting}>
                     Xóa
                   </Button>
                 </Popconfirm>
               </Space>
-            </Card>
-          </Col>
+            }
+            style={{ height: '100%' }}
+          >
+            <div style={{ display: 'flex', gap: 24 }}>
+              {/* Cột trái: Thông tin */}
+              <div style={{ flex: 1, minWidth: 140 }}>
+                <div style={{ marginBottom: 12 }}>
+                  <strong>Tác giả:</strong>{' '}
+                  <Space>
+                    <Avatar size="small" icon={<UserOutlined />} />
+                    <span>{article.author}</span>
+                  </Space>
+                </div>
+
+                <Tag
+                  color={article.status === 'published' ? 'green' : 'orange'}
+                  style={{ marginBottom: 8 }}
+                >
+                  {article.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                </Tag>
+
+                <div style={{ color: '#888', fontSize: 13 }}>
+                  Ngày: {new Date(article.createdAt).toLocaleDateString('vi-VN')}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  flex: 2,
+                  minHeight: 240,
+                  maxHeight: 300,
+                  overflow: 'hidden',
+                  borderLeft: '1px solid #f0f0f0',
+                  paddingLeft: 20,
+                  fontSize: 14.5,
+                  lineHeight: 1.7,
+                  color: '#333',
+                }}
+                className="article-preview-content"
+                dangerouslySetInnerHTML={{
+                  __html: article.content || '<em>Chưa có nội dung</em>',
+                }}
+              />
+            </div>
+          </Card>
         ))}
-      </Row>
+      </div>
     </div>
   );
 };

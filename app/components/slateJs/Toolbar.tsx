@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ColorPicker, Select, Divider, message, Upload } from 'antd';
+import { Button, ColorPicker, Select, Divider } from 'antd';
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -8,8 +8,8 @@ import {
   YoutubeOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Editor } from 'slate';
-import axios from 'axios';
+import { Editor, Transforms } from 'slate';
+import { uploadToCloudinary } from '@/app/lib/cloudinary';
 
 interface ToolbarProps {
   editor: Editor;
@@ -17,10 +17,6 @@ interface ToolbarProps {
   onInsertVideo: () => void;
   onInsertYoutube: () => void;
 }
-
-const CLOUDINARY_CLOUD_NAME = 'donbgiqo5';
-const CLOUDINARY_UPLOAD_PRESET = 'text_editor';
-const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
 
 export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertYoutube }) => {
   const [color, setColor] = useState('#000000');
@@ -51,50 +47,72 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertYoutube }) => 
     Editor.addMark(editor, 'fontFamily', family);
   };
 
-  const uploadToCloudinary = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-    try {
-      const res = await axios.post(CLOUDINARY_UPLOAD_URL, formData);
-      return res.data.secure_url; // URL trả về từ Cloudinary
-    } catch (err) {
-      message.error('Upload thất bại');
-      console.error(err);
-      return null;
-    }
-  };
-
-  const onInsertImage = async () => {
+  const handleInsertImage = async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = async () => {
-      if (!input.files?.length) return;
-      const file = input.files[0];
-      const url = await uploadToCloudinary(file);
-      if (url) {
-        // chèn vào editor
-        Editor.insertText(editor, `![image](${url})`);
+
+    input.onchange = async (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files?.length) return;
+
+      const file = files[0];
+      const result = await uploadToCloudinary(file, {
+        resourceType: 'image',
+      });
+
+      if (result) {
+        // Chèn image node vào editor
+        const imageNode = {
+          type: 'image' as const,
+          url: result.url,
+          children: [{ text: '' }],
+        };
+
+        Transforms.insertNodes(editor, imageNode);
+
+        // Thêm paragraph trống phía sau để tiếp tục nhập
+        Transforms.insertNodes(editor, {
+          type: 'paragraph' as const,
+          children: [{ text: '' }],
+        });
       }
     };
+
     input.click();
   };
 
-  const onInsertVideo = async () => {
+  const handleInsertVideo = async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
-    input.onchange = async () => {
-      if (!input.files?.length) return;
-      const file = input.files[0];
-      const url = await uploadToCloudinary(file);
-      if (url) {
-        // chèn vào editor
-        Editor.insertText(editor, `[video](${url})`);
+
+    input.onchange = async (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files?.length) return;
+
+      const file = files[0];
+      const result = await uploadToCloudinary(file, {
+        resourceType: 'video',
+      });
+
+      if (result) {
+        const videoNode = {
+          type: 'video' as const,
+          url: result.url,
+          children: [{ text: '' }],
+        };
+
+        Transforms.insertNodes(editor, videoNode);
+
+        // Thêm paragraph trống phía sau
+        Transforms.insertNodes(editor, {
+          type: 'paragraph' as const,
+          children: [{ text: '' }],
+        });
       }
     };
+
     input.click();
   };
 
@@ -158,10 +176,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({ editor, onInsertYoutube }) => 
 
       <Divider type="vertical" />
 
-      <Button icon={<PictureOutlined />} onClick={onInsertImage}>
+      <Button icon={<PictureOutlined />} onClick={handleInsertImage}>
         Ảnh
       </Button>
-      <Button icon={<VideoCameraOutlined />} onClick={onInsertVideo}>
+      <Button icon={<VideoCameraOutlined />} onClick={handleInsertVideo}>
         Video
       </Button>
       <Button icon={<YoutubeOutlined />} onClick={onInsertYoutube}>
